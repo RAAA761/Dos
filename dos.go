@@ -20,6 +20,20 @@ type Response struct {
 }
 
 func executeHandler(w http.ResponseWriter, r *http.Request) {
+	   w.Header().Set("Access-Control-Allow-Origin", "*") // 本番は制限したほうが良いです
+    w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+    w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+
+    // プリフライトリクエストに対応
+    if r.Method == "OPTIONS" {
+        w.WriteHeader(http.StatusOK)
+        return
+    }
+
+    if r.Method != "POST" {
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        return
+    }
 	var req Request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
